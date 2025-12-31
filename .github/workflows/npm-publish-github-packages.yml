@@ -1,10 +1,9 @@
-# This workflow will automatically publish to both GitHub Packages and npm registry when you push a git tag
+# This workflow will automatically publish to GitHub Packages when you push a git tag
 # Usage: git tag v1.0.4 && git push origin v1.0.4
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 #
 # Required secrets:
 # - ACCESS_TOKEN: GitHub Personal Access Token with packages:write permission
-# - NPM_TOKEN: npm access token with publish permission (get from https://www.npmjs.com/settings/YOUR_USERNAME/tokens)
 
 name: Auto Release and Publish
 
@@ -71,17 +70,6 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.ACCESS_TOKEN}}
-      
-      - name: Configure npm for npm registry
-        if: secrets.NPM_TOKEN != ''
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> ~/.npmrc
-      
-      - name: Publish to npm Registry
-        if: secrets.NPM_TOKEN != ''
-        run: npm run publish:npm
-        env:
-          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1

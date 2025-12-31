@@ -1,0 +1,68 @@
+# This workflow publishes the package to npm registry using Trusted Publishing (OIDC)
+# Usage: git tag v1.0.10 && git push origin v1.0.10
+# 
+# Prerequisites:
+# 1. Set up Trusted Publishing on npmjs.com:
+#    - Go to https://www.npmjs.com/settings/YOUR_USERNAME/security
+#    - Enable "Automation" and add your GitHub repository
+#    - This allows OIDC authentication without storing tokens
+#
+# For more information see: https://docs.npmjs.com/github-actions-authentication
+
+name: Publish to npm Registry
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on tags starting with 'v'
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: tag-version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
+
+      - name: Verify version matches package.json
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ steps.tag-version.outputs.version }}"
+          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: Tag version ($TAG_VERSION) doesn't match package.json version ($PACKAGE_VERSION)"
+            exit 1
+          fi
+          echo "Versions match: $PACKAGE_VERSION"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          registry-url: 'https://registry.npmjs.org'
+          # OIDC is automatically used when registry-url is set and id-token: write permission is granted
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build
+
+      - name: Publish to npm Registry
+        # Use the publish script which handles publishConfig override and --access=public
+        run: npm run publish:npm
+
+      - name: Verify publication
+        run: |
+          echo "✅ Package published to npm registry!"
+          echo "Install with: npx @rehanqasimk/happy-new-year@${{ steps.tag-version.outputs.version }}"
+
