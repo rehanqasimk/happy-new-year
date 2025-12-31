@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2015",          /* Specify ECMAScript target version */
+    "module": "commonjs",        /* Specify module code generation */
+    "strict": true,              /* Enable all strict type-checking options */
+    "esModuleInterop": true,     /* Enable compatibility for CommonJS modules */
+    "rootDir": "./src",          /* Specify the root directory of source files */
+    "outDir": "./dist",          /* Specify an output directory for compiled JS */
+    "sourceMap": true,           /* Generate corresponding .map files */
+    "declaration": true,         /* Generate corresponding .d.ts files */
+    "declarationMap": true       /* Generate corresponding .d.ts.map files */
+  }
+}
