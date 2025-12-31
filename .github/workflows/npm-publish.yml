@@ -2,10 +2,13 @@
 # Usage: git tag v1.0.10 && git push origin v1.0.10
 # 
 # Prerequisites:
-# 1. Set up Trusted Publishing on npmjs.com:
+# 1. Set up Trusted Publishing on npmjs.com (REQUIRED):
 #    - Go to https://www.npmjs.com/settings/YOUR_USERNAME/security
-#    - Enable "Automation" and add your GitHub repository
+#    - Click "Automation" tab
+#    - Click "Add GitHub Actions workflow"
+#    - Select your repository: rehanqasimk/happy-new-year
 #    - This allows OIDC authentication without storing tokens
+#    - Without this, the workflow will fail with authentication errors
 #
 # For more information see: https://docs.npmjs.com/github-actions-authentication
 
@@ -57,9 +60,20 @@ jobs:
       - name: Build package
         run: npm run build
 
+      - name: Remove publishConfig for npm publish
+        # Temporarily remove publishConfig so npm publishes to npmjs.org instead of GitHub Packages
+        run: |
+          node -e "const fs=require('fs');const pkg=JSON.parse(fs.readFileSync('package.json'));delete pkg.publishConfig;fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');"
+
       - name: Publish to npm Registry
-        # Use the publish script which handles publishConfig override and --access=public
-        run: npm run publish:npm
+        # Publish as public package (required for scoped packages)
+        run: npm publish --access=public
+
+      - name: Restore publishConfig
+        # Restore publishConfig for GitHub Packages
+        run: |
+          node -e "const fs=require('fs');const pkg=JSON.parse(fs.readFileSync('package.json'));pkg.publishConfig={registry:'https://npm.pkg.github.com',access:'public'};fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');"
+        if: always()
 
       - name: Verify publication
         run: |
