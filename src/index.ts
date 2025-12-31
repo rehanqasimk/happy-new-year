@@ -140,34 +140,26 @@ function showMessage() {
     ' '.repeat(70 - padding - message.length) + 
     borderColor + '║' + colors.reset
   );
+  console.log(borderColor + '║' + ' '.repeat(70) + '║' + colors.reset);
+  console.log(borderColor + '╚' + '═'.repeat(70) + '╝' + colors.reset);
   
   console.log('\n');
   
-  // Big ASCII art for "FROM REHAN QASIM"
-  const fromText = [
-    '███████╗██████╗  ██████╗ ███╗   ███╗    ██████╗ ███████╗██╗  ██╗ █████╗ ███╗   ██╗    ██████╗  █████╗ ███████╗██╗███╗   ███╗',
-    '██╔════╝██╔══██╗██╔═══██╗████╗ ████║    ██╔══██╗██╔════╝██║  ██║██╔══██╗████╗ ██║    ██╔══██╗██╔══██╗██╔════╝██║████╗ ████║',
-    '█████╗  ██████╔╝██║   ██║██╔████╔██║    ██████╔╝███████╗███████║███████║██╔██╗██║    ██████╔╝███████║███████╗██║██╔████╔██║',
-    '██╔══╝  ██╔══██╗██║   ██║██║╚██╔╝██║    ██╔══██╗╚════██║██╔══██║██╔══██║██║╚██╗██║    ██╔═══╝ ██╔══██║╚════██║██║██║╚██╔╝██║',
-    '██║     ██║  ██║╚██████╔╝██║ ╚═╝ ██║    ██║  ██║███████║██║  ██║██║  ██║██║ ╚████║    ██║     ██║  ██║███████║██║██║ ╚═╝ ██║',
-    '╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝    ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝    ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝',
-  ];
-
-  const fromColorSequence = [
-    colors.brightMagenta,
-    colors.brightCyan,
-    colors.brightBlue,
-    colors.brightGreen,
-    colors.brightYellow,
-    colors.brightRed,
-  ];
-
-  // Print big colorful "FROM REHAN QASIM" text
-  fromText.forEach((line, index) => {
-    const color = fromColorSequence[index % fromColorSequence.length];
-    console.log(color + line + colors.reset);
-  });
-
+  // Simple text for "FROM REHAN QASIM"
+  console.log(borderColor + '╔' + '═'.repeat(70) + '╗' + colors.reset);
+  console.log(borderColor + '║' + ' '.repeat(70) + '║' + colors.reset);
+  const fromMessage = 'FROM REHAN QASIM';
+  const fromPadding = Math.floor((70 - fromMessage.length) / 2);
+  console.log(
+    borderColor + '║' + colors.reset + 
+    ' '.repeat(fromPadding) + 
+    nameColor + colors.bright + fromMessage + colors.reset + 
+    ' '.repeat(70 - fromPadding - fromMessage.length) + 
+    borderColor + '║' + colors.reset
+  );
+  console.log(borderColor + '║' + ' '.repeat(70) + '║' + colors.reset);
+  console.log(borderColor + '╚' + '═'.repeat(70) + '╝' + colors.reset);
+  
   console.log('\n');
 }
 
