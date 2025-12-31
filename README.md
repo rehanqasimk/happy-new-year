@@ -4,8 +4,30 @@ A fun CLI tool that displays colorful ASCII fireworks and a Happy New Year messa
 
 ## Installation
 
+### Using npx (Recommended)
+
+**Important:** For GitHub npm registry packages, you need to configure npm to find the package. Add this to your `~/.npmrc` file (or create it if it doesn't exist):
+
+```
+@rehanqasimk:registry=https://npm.pkg.github.com
+```
+
+Then run:
+
 ```bash
 npx @rehanqasimk/happy-new-year
+```
+
+**Note:** If you get authentication errors, you may need to authenticate with GitHub npm registry:
+```bash
+npm login --scope=@rehanqasimk --registry=https://npm.pkg.github.com
+```
+
+### Alternative: Install globally
+
+```bash
+npm install -g @rehanqasimk/happy-new-year --registry=https://npm.pkg.github.com
+happy-new-year
 ```
 
 ## Usage

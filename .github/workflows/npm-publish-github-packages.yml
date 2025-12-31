@@ -24,13 +24,22 @@ jobs:
           registry-url: https://npm.pkg.github.com/
           scope: '@rehanqasimk'
       
+      - name: Configure npm for GitHub Packages
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{secrets.GITHUB_TOKEN}}" >> ~/.npmrc
+          echo "@rehanqasimk:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      
       - name: Install dependencies
         run: npm ci
       
       - name: Build package
         run: npm run build
       
+      - name: Verify bin field
+        run: |
+          node -e "const pkg = require('./package.json'); console.log('Bin field:', JSON.stringify(pkg.bin, null, 2));"
+          test -f dist/index.js && echo "dist/index.js exists" || echo "ERROR: dist/index.js not found"
+          head -1 dist/index.js | grep -q "#!/usr/bin/env node" && echo "Shebang found" || echo "WARNING: Shebang not found"
+      
       - name: Publish to GitHub Packages
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

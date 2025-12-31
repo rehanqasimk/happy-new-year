@@ -1,11 +1,11 @@
 {
   "name": "@rehanqasimk/happy-new-year",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A fun CLI tool that displays ASCII fireworks and a Happy New Year message. Inspired by firew0rks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "happy-new-year": "./dist/index.js"
+    "happy-new-year": "dist/index.js"
   },
   "files": [
     "dist",
