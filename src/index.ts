@@ -145,9 +145,10 @@ function showMessage() {
   
   console.log('\n');
   
-  // Simple text for "FROM REHAN QASIM"
+  // Simple text for "FROM REHAN QASIM" in a bordered box
   console.log(borderColor + '╔' + '═'.repeat(70) + '╗' + colors.reset);
   console.log(borderColor + '║' + ' '.repeat(70) + '║' + colors.reset);
+  
   const fromMessage = 'FROM REHAN QASIM';
   const fromPadding = Math.floor((70 - fromMessage.length) / 2);
   console.log(
@@ -157,6 +158,7 @@ function showMessage() {
     ' '.repeat(70 - fromPadding - fromMessage.length) + 
     borderColor + '║' + colors.reset
   );
+  
   console.log(borderColor + '║' + ' '.repeat(70) + '║' + colors.reset);
   console.log(borderColor + '╚' + '═'.repeat(70) + '╝' + colors.reset);
   
