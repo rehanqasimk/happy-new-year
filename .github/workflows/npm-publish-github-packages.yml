@@ -72,10 +72,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.ACCESS_TOKEN}}
       
+      - name: Configure npm for npm registry
+        if: secrets.NPM_TOKEN != ''
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{secrets.NPM_TOKEN}}" >> ~/.npmrc
+      
       - name: Publish to npm Registry
-        run: npm publish --registry=https://registry.npmjs.org
+        if: secrets.NPM_TOKEN != ''
+        run: npm run publish:npm
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
