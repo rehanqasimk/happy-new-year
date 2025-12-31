@@ -1,31 +1,31 @@
-name: Publish Package
+# name: Publish Package
 
-on:
-  push:
-    tags:
-      - 'v*'
+# on:
+#   push:
+#     tags:
+#       - 'v*'
 
-permissions:
-  id-token: write  # Required for OIDC
-  contents: read
+# permissions:
+#   id-token: write  # Required for OIDC
+#   contents: read
 
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+# jobs:
+#   publish:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-      - name: Configure npm for npmjs.org
-        run: |
-          rm -f .npmrc
-          echo "//registry.npmjs.org/:_authToken=${{secrets.ACCESS_TOKEN}}" > ~/.npmrc
-          echo "@rehanqasimk:registry=https://registry.npmjs.org" >> ~/.npmrc
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: '24'
+#           registry-url: 'https://registry.npmjs.org'
+#       - name: Configure npm for npmjs.org
+#         run: |
+#           rm -f .npmrc
+#           echo "//registry.npmjs.org/:_authToken=${{secrets.ACCESS_TOKEN}}" > ~/.npmrc
+#           echo "@rehanqasimk:registry=https://registry.npmjs.org" >> ~/.npmrc
+#       - run: npm ci
+#       - run: npm run build --if-present
+#       - run: npm publish
+#         env:
+#           NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
