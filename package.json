@@ -1,6 +1,6 @@
 {
   "name": "@rehanqasimk/happy-new-year",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A fun CLI tool that displays ASCII fireworks and a Happy New Year message. Inspired by firew0rks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -28,7 +28,8 @@
   "license": "ISC",
   "type": "commonjs",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
   },
   "repository": {
     "type": "git",
