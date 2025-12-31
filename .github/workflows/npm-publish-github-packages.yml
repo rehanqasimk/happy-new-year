@@ -1,21 +1,40 @@
-# This workflow will build and publish the package to GitHub Packages when a release is created
+# This workflow will automatically publish when you push a git tag
+# Usage: git tag v1.0.4 && git push origin v1.0.4
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 
-name: Publish to GitHub Packages
+name: Auto Release and Publish
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'  # Triggers on tags starting with 'v'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Get version from tag
+        id: tag-version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
+      
+      - name: Verify version matches package.json
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ steps.tag-version.outputs.version }}"
+          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: Tag version ($TAG_VERSION) doesn't match package.json version ($PACKAGE_VERSION)"
+            exit 1
+          fi
+          echo "Versions match: $PACKAGE_VERSION"
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,12 +47,9 @@ jobs:
       
       - name: Configure npm for GitHub Packages
         run: |
-          # Remove any local .npmrc that might interfere
           rm -f .npmrc
-          # Configure npm for GitHub Packages
           echo "//npm.pkg.github.com/:_authToken=${{secrets.ACCESS_TOKEN}}" > ~/.npmrc
           echo "@rehanqasimk:registry=https://npm.pkg.github.com" >> ~/.npmrc
-          echo "Configured .npmrc for GitHub Packages"
       
       - name: Install dependencies
         run: npm ci
@@ -51,3 +67,20 @@ jobs:
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.ACCESS_TOKEN}}
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.tag-version.outputs.version }}
+          name: Release v${{ steps.tag-version.outputs.version }}
+          body: |
+            ## Changes in v${{ steps.tag-version.outputs.version }}
+            
+            Automated release for version ${{ steps.tag-version.outputs.version }}
+            
+            ### Installation
+            ```bash
+            npx @rehanqasimk/happy-new-year@${{ steps.tag-version.outputs.version }}
+            ```
+        env:
+          GITHUB_TOKEN: ${{secrets.ACCESS_TOKEN}}
