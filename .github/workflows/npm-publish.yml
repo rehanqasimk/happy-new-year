@@ -1,14 +1,19 @@
 # This workflow publishes the package to npm registry using Trusted Publishing (OIDC)
 # Usage: git tag v1.0.10 && git push origin v1.0.10
 # 
-# Prerequisites:
-# 1. Set up Trusted Publishing on npmjs.com (REQUIRED):
+# Prerequisites (choose one):
+# 
+# Option 1: Trusted Publishing (OIDC) - Recommended
 #    - Go to https://www.npmjs.com/settings/YOUR_USERNAME/security
 #    - Click "Automation" tab
 #    - Click "Add GitHub Actions workflow"
 #    - Select your repository: rehanqasimk/happy-new-year
 #    - This allows OIDC authentication without storing tokens
-#    - Without this, the workflow will fail with authentication errors
+#
+# Option 2: NPM_TOKEN (Fallback)
+#    - Create an npm access token at https://www.npmjs.com/settings/YOUR_USERNAME/tokens
+#    - Create an "Automation" token
+#    - Add it as NPM_TOKEN secret in GitHub repository settings
 #
 # For more information see: https://docs.npmjs.com/github-actions-authentication
 
@@ -47,12 +52,27 @@ jobs:
           fi
           echo "Versions match: $PACKAGE_VERSION"
 
-      - name: Setup Node.js
+      - name: Setup Node.js (OIDC)
+        if: ${{ !secrets.NPM_TOKEN }}
         uses: actions/setup-node@v4
         with:
           node-version: '24.12.0'
           registry-url: 'https://registry.npmjs.org'
           # OIDC is automatically used when registry-url is set and id-token: write permission is granted
+
+      - name: Setup Node.js (Token)
+        if: ${{ secrets.NPM_TOKEN }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.12.0'
+          registry-url: 'https://registry.npmjs.org'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Configure npm with token (if using token auth)
+        if: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
 
       - name: Install dependencies
         run: npm ci
@@ -60,20 +80,12 @@ jobs:
       - name: Build package
         run: npm run build
 
-      - name: Remove publishConfig for npm publish
-        # Temporarily remove publishConfig so npm publishes to npmjs.org instead of GitHub Packages
-        run: |
-          node -e "const fs=require('fs');const pkg=JSON.parse(fs.readFileSync('package.json'));delete pkg.publishConfig;fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');"
-
       - name: Publish to npm Registry
-        # Publish as public package (required for scoped packages)
-        run: npm publish --access=public
-
-      - name: Restore publishConfig
-        # Restore publishConfig for GitHub Packages
-        run: |
-          node -e "const fs=require('fs');const pkg=JSON.parse(fs.readFileSync('package.json'));pkg.publishConfig={registry:'https://npm.pkg.github.com',access:'public'};fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');"
-        if: always()
+        # Use the same script that works locally - it handles publishConfig override and --access=public
+        run: npm run publish:npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify publication
         run: |
